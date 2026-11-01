@@ -71,3 +71,4 @@ hcom/*.sqlite*
 hcom/logs/
 .multi-agent-runtime/
 
+.crew/

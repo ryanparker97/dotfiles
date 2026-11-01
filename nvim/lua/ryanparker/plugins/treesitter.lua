@@ -27,14 +27,23 @@ return {
         "hcl",
         "markdown",
         "markdown_inline",
+        "regex",
       }
-      if vim.fn.executable("tree-sitter") == 1 then
-        require("nvim-treesitter").install(parsers)
-      else
-        vim.schedule(function()
+      local function install_missing()
+        local installed = require("nvim-treesitter").get_installed("parsers")
+        local missing = vim.tbl_filter(function(p)
+          return not vim.list_contains(installed, p)
+        end, parsers)
+        if #missing == 0 then
+          return
+        end
+        if vim.fn.executable("tree-sitter") ~= 1 then
           vim.notify("Install tree-sitter CLI for parser install/update: brew install tree-sitter", vim.log.levels.WARN)
-        end)
+          return
+        end
+        require("nvim-treesitter").install(missing)
       end
+      vim.api.nvim_create_autocmd("User", { pattern = "VeryLazy", once = true, callback = install_missing })
       pcall(vim.treesitter.language.register, "sql", "sql.dbt")
       pcall(vim.treesitter.language.register, "yaml", "yaml.cloudformation")
       pcall(vim.treesitter.language.register, "terraform", "terraform-vars")

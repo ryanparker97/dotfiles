@@ -153,7 +153,15 @@ return {
     -- Same <M-h/j/k/l> keys as tmux; at the edge of the Neovim layout it moves to
     -- the neighbouring tmux pane (see the is_vim binds in tmux/tmux.conf).
     "mrjones2014/smart-splits.nvim",
-    lazy = false, -- sets @pane-is-vim at startup for tmux
+    lazy = false, -- the tmux backend marks the pane (@pane-is-vim) at startup; do not lazy load
+    dependencies = {
+      -- smart-splits v3 ships no multiplexer support. Without this backend the
+      -- <M-h/j/k/l> keys stop at the edge of the Neovim layout.
+      { "smart-splits-nvim/backend-tmux", main = "smart-splits-backend-tmux" },
+    },
+    opts = {
+      mux = { backend = "smart-splits-backend-tmux" },
+    },
     keys = {
       {
         "<M-h>",

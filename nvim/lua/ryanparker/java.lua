@@ -64,6 +64,19 @@ local function resolve_jdk()
   return nil
 end
 
+local function debug_bundles()
+  local pkgs = vim.fn.stdpath("data") .. "/mason/packages/"
+  local bundles =
+    vim.fn.glob(pkgs .. "java-debug-adapter/extension/server/com.microsoft.java.debug.plugin-*.jar", true, true)
+  local skip = { ["com.microsoft.java.test.runner-jar-with-dependencies.jar"] = true, ["jacocoagent.jar"] = true }
+  for _, jar in ipairs(vim.fn.glob(pkgs .. "java-test/extension/server/*.jar", true, true)) do
+    if not skip[vim.fs.basename(jar)] then
+      table.insert(bundles, jar)
+    end
+  end
+  return bundles
+end
+
 function M.start()
   local ok, jdtls = pcall(require, "jdtls")
   if not ok then
@@ -89,6 +102,7 @@ function M.start()
     return
   end
 
+  local bundles = debug_bundles()
   local jdk = resolve_jdk()
   if not jdk then
     if not warned_no_jdk then
@@ -113,6 +127,10 @@ function M.start()
     capabilities = blink.get_lsp_capabilities(capabilities)
   end
 
+  if #bundles > 0 then
+    require("jdtls.dap").setup_dap({ hotcodereplace = "auto" })
+  end
+
   jdtls.start_or_attach({
     cmd = { jdtls_bin, "--java-executable", jdk .. "/bin/java", "-data", workspace_dir },
     cmd_env = { JAVA_HOME = jdk, PATH = jdk .. "/bin:" .. (vim.env.PATH or "") },
@@ -129,8 +147,10 @@ function M.start()
         contentProvider = { preferred = "fernflower" },
       },
     },
-    init_options = { bundles = {} },
-  })
+    init_options = { bundles = bundles },
+  }, { dap = { hotcodereplace = "auto" } })
 end
+
+M.debug_bundles = debug_bundles
 
 return M

@@ -2,6 +2,7 @@ return {
   {
     "mfussenegger/nvim-lint",
     event = { "BufReadPost", "BufNewFile" },
+    dependencies = { "mason-org/mason.nvim" },
     config = function()
       local lint = require("lint")
       lint.linters_by_ft = {
@@ -26,8 +27,7 @@ return {
       -- Slow linters: never run while typing (InsertLeave).
       local slow = { sqlfluff = true }
 
-      -- Per-linter availability cache. Positive results are kept for the session;
-      -- negative ones are dropped when mason finishes installing tools.
+      -- Per-linter availability cache: only hits are cached, so tools installed mid-session are picked up.
       local availability = {}
 
       local function resolve_linter(name)
@@ -43,9 +43,8 @@ return {
       end
 
       local function linter_is_available(name)
-        local cached = availability[name]
-        if cached ~= nil then
-          return cached
+        if availability[name] then
+          return true
         end
         local available = false
         local linter = resolve_linter(name)
@@ -57,7 +56,9 @@ return {
           end
           available = type(cmd) == "string" and vim.fn.executable(cmd) == 1
         end
-        availability[name] = available
+        if available then
+          availability[name] = true
+        end
         return available
       end
 
@@ -97,17 +98,6 @@ return {
         group = group,
         callback = function(args)
           try_lint(args.buf, { skip_slow = true })
-        end,
-      })
-      vim.api.nvim_create_autocmd("User", {
-        group = group,
-        pattern = "MasonToolsUpdateCompleted",
-        callback = function()
-          for name, ok in pairs(availability) do
-            if not ok then
-              availability[name] = nil
-            end
-          end
         end,
       })
     end,
