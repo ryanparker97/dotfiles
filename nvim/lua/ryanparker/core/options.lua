@@ -36,6 +36,7 @@ opt.updatetime = 250
 opt.timeoutlen = 400
 opt.completeopt = { "menu", "menuone", "noselect", "fuzzy" }
 opt.pumheight = 10
+opt.pumborder = "rounded"
 opt.mouse = "a"
 opt.smoothscroll = true
 opt.jumpoptions = "view"

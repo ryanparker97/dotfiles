@@ -34,6 +34,9 @@ local function mason_tools()
     "tflint",
     "cfn-lint",
     "ruff",
+    "debugpy",
+    "java-debug-adapter",
+    "java-test",
     "terraform",
     "markdownlint-cli2",
     "yamllint",
@@ -101,7 +104,11 @@ return {
         underline = true,
         virtual_text = { current_line = true },
         severity_sort = true,
-        jump = { float = true },
+        jump = {
+          on_jump = function(_, bufnr)
+            vim.diagnostic.open_float({ bufnr = bufnr, scope = "cursor", focus = false })
+          end,
+        },
         float = { border = "rounded", source = true },
       })
     end,
