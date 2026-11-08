@@ -1,3 +1,5 @@
+local call = require("ryanparker.util.keys").lazy_call
+
 return {
   {
     "folke/trouble.nvim",
@@ -30,9 +32,7 @@ return {
       },
       {
         "<leader>sr",
-        function()
-          require("grug-far").with_visual_selection()
-        end,
+        call("grug-far", "with_visual_selection"),
         mode = "x",
         desc = "Search and replace (selection)",
       },
@@ -49,58 +49,42 @@ return {
     keys = {
       {
         "<leader>Db",
-        function()
-          require("dap").toggle_breakpoint()
-        end,
+        call("dap", "toggle_breakpoint"),
         desc = "Toggle breakpoint",
       },
       {
         "<leader>Dc",
-        function()
-          require("dap").continue()
-        end,
+        call("dap", "continue"),
         desc = "Continue / start",
       },
       {
         "<leader>Di",
-        function()
-          require("dap").step_into()
-        end,
+        call("dap", "step_into"),
         desc = "Step into",
       },
       {
         "<leader>Do",
-        function()
-          require("dap").step_over()
-        end,
+        call("dap", "step_over"),
         desc = "Step over",
       },
       {
         "<leader>DO",
-        function()
-          require("dap").step_out()
-        end,
+        call("dap", "step_out"),
         desc = "Step out",
       },
       {
         "<leader>Dr",
-        function()
-          require("dap").repl.toggle()
-        end,
+        call("dap", "repl.toggle"),
         desc = "Toggle REPL",
       },
       {
         "<leader>Dt",
-        function()
-          require("dap").terminate()
-        end,
+        call("dap", "terminate"),
         desc = "Terminate",
       },
       {
         "<leader>Du",
-        function()
-          require("dapui").toggle()
-        end,
+        call("dapui", "toggle"),
         desc = "Toggle debug UI",
       },
     },
@@ -137,9 +121,7 @@ return {
     keys = {
       {
         "<leader>tt",
-        function()
-          require("neotest").run.run()
-        end,
+        call("neotest", "run.run"),
         desc = "Run nearest test",
       },
       {
@@ -151,30 +133,22 @@ return {
       },
       {
         "<leader>td",
-        function()
-          require("neotest").run.run({ strategy = "dap" })
-        end,
+        call("neotest", "run.run", { strategy = "dap" }),
         desc = "Debug nearest test",
       },
       {
         "<leader>ts",
-        function()
-          require("neotest").summary.toggle()
-        end,
+        call("neotest", "summary.toggle"),
         desc = "Toggle summary",
       },
       {
         "<leader>to",
-        function()
-          require("neotest").output.open({ enter = true })
-        end,
+        call("neotest", "output.open", { enter = true }),
         desc = "Show output",
       },
       {
         "<leader>tl",
-        function()
-          require("neotest").run.run_last()
-        end,
+        call("neotest", "run.run_last"),
         desc = "Run last test",
       },
     },
@@ -187,4 +161,5 @@ return {
       })
     end,
   },
+  require("ryanparker.util.mason").ensure({ "debugpy" }),
 }

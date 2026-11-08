@@ -44,9 +44,9 @@ return {
         require("nvim-treesitter").install(missing)
       end
       vim.api.nvim_create_autocmd("User", { pattern = "VeryLazy", once = true, callback = install_missing })
-      pcall(vim.treesitter.language.register, "sql", "sql.dbt")
-      pcall(vim.treesitter.language.register, "yaml", "yaml.cloudformation")
-      pcall(vim.treesitter.language.register, "terraform", "terraform-vars")
+      for ft, lang in pairs(require("ryanparker.core.filetypes").parser_aliases) do
+        pcall(vim.treesitter.language.register, lang, ft)
+      end
 
       local function start(buf)
         local ft = vim.bo[buf].filetype
@@ -60,7 +60,7 @@ return {
       end
 
       vim.api.nvim_create_autocmd("FileType", {
-        group = vim.api.nvim_create_augroup("treesitter_start", { clear = true }),
+        group = require("ryanparker.util.autocmd").augroup("treesitter"),
         callback = function(args)
           start(args.buf)
         end,

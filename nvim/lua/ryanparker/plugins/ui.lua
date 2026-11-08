@@ -1,3 +1,5 @@
+local call = require("ryanparker.util.keys").lazy_call
+
 return {
   { "nvim-tree/nvim-web-devicons", lazy = true },
 
@@ -23,23 +25,17 @@ return {
     keys = {
       {
         "<leader>Ss",
-        function()
-          require("persistence").load()
-        end,
+        call("persistence", "load"),
         desc = "Restore session (cwd)",
       },
       {
         "<leader>Sl",
-        function()
-          require("persistence").load({ last = true })
-        end,
+        call("persistence", "load", { last = true }),
         desc = "Restore last session",
       },
       {
         "<leader>Sd",
-        function()
-          require("persistence").stop()
-        end,
+        call("persistence", "stop"),
         desc = "Don't save session",
       },
     },

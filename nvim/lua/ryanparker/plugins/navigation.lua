@@ -1,3 +1,5 @@
+local call = require("ryanparker.util.keys").lazy_call
+
 return {
   {
     "stevearc/oil.nvim",
@@ -5,16 +7,12 @@ return {
     keys = {
       {
         "<leader>e",
-        function()
-          require("oil").toggle_float()
-        end,
+        call("oil", "toggle_float"),
         desc = "File explorer",
       },
       {
         "-",
-        function()
-          require("oil").open()
-        end,
+        call("oil", "open"),
         desc = "Open parent directory",
       },
     },
@@ -66,65 +64,47 @@ return {
     keys = {
       {
         "<leader>ff",
-        function()
-          require("telescope.builtin").find_files()
-        end,
+        call("telescope.builtin", "find_files"),
         desc = "Find files",
       },
       {
         "<leader>fg",
-        function()
-          require("telescope.builtin").live_grep()
-        end,
+        call("telescope.builtin", "live_grep"),
         desc = "Live grep",
       },
       {
         "<leader>fb",
-        function()
-          require("telescope.builtin").buffers()
-        end,
+        call("telescope.builtin", "buffers"),
         desc = "Buffers",
       },
       {
         "<leader>fh",
-        function()
-          require("telescope.builtin").help_tags()
-        end,
+        call("telescope.builtin", "help_tags"),
         desc = "Help",
       },
       {
         "<leader>fr",
-        function()
-          require("telescope.builtin").oldfiles()
-        end,
+        call("telescope.builtin", "oldfiles"),
         desc = "Recent files",
       },
       {
         "<leader>fd",
-        function()
-          require("telescope.builtin").diagnostics()
-        end,
+        call("telescope.builtin", "diagnostics"),
         desc = "Diagnostics",
       },
       {
         "<leader>fs",
-        function()
-          require("telescope.builtin").lsp_document_symbols()
-        end,
+        call("telescope.builtin", "lsp_document_symbols"),
         desc = "Document symbols",
       },
       {
         "<leader>fw",
-        function()
-          require("telescope.builtin").grep_string()
-        end,
+        call("telescope.builtin", "grep_string"),
         desc = "Grep word under cursor",
       },
       {
         "<leader>/",
-        function()
-          require("telescope.builtin").current_buffer_fuzzy_find()
-        end,
+        call("telescope.builtin", "current_buffer_fuzzy_find"),
         desc = "Search in buffer",
       },
     },
@@ -165,30 +145,22 @@ return {
     keys = {
       {
         "<M-h>",
-        function()
-          require("smart-splits").move_cursor_left()
-        end,
+        call("smart-splits", "move_cursor_left"),
         desc = "Go to left split/pane",
       },
       {
         "<M-j>",
-        function()
-          require("smart-splits").move_cursor_down()
-        end,
+        call("smart-splits", "move_cursor_down"),
         desc = "Go to lower split/pane",
       },
       {
         "<M-k>",
-        function()
-          require("smart-splits").move_cursor_up()
-        end,
+        call("smart-splits", "move_cursor_up"),
         desc = "Go to upper split/pane",
       },
       {
         "<M-l>",
-        function()
-          require("smart-splits").move_cursor_right()
-        end,
+        call("smart-splits", "move_cursor_right"),
         desc = "Go to right split/pane",
       },
     },
@@ -200,17 +172,13 @@ return {
     keys = {
       {
         "<leader>j",
-        function()
-          require("flash").jump()
-        end,
+        call("flash", "jump"),
         mode = { "n", "x", "o" },
         desc = "Easy jump",
       },
       {
         "<leader>J",
-        function()
-          require("flash").treesitter()
-        end,
+        call("flash", "treesitter"),
         mode = { "n", "x", "o" },
         desc = "Treesitter jump",
       },

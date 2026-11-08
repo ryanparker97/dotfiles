@@ -1,45 +1,4 @@
--- Filetype hints for SRE/data files that Neovim cannot always infer.
-vim.filetype.add({
-  extension = {
-    -- Built-in detection returns "tf" for empty or comment-only files, so new
-    -- Terraform buffers would miss the terraform formatters/LSP until reopened.
-    tf = "terraform",
-  },
-  pattern = {
-    [".*%.ya?ml"] = {
-      function(path, bufnr)
-        local lines
-        if bufnr and vim.api.nvim_buf_is_valid(bufnr) and vim.api.nvim_buf_is_loaded(bufnr) then
-          lines = vim.api.nvim_buf_get_lines(bufnr, 0, 50, false)
-        elseif path and vim.fn.filereadable(path) == 1 then
-          lines = vim.fn.readfile(path, "", 50)
-        end
-        for _, line in ipairs(lines or {}) do
-          if line:find("AWSTemplateFormatVersion", 1, true) or line:find("AWS::", 1, true) then
-            return "yaml.cloudformation"
-          end
-        end
-      end,
-    },
-    [".*%.sql"] = {
-      function(path)
-        if not path then
-          return nil
-        end
-        for _, dir in ipairs({ "models", "macros", "analyses", "seeds", "snapshots", "tests" }) do
-          if path:find("/" .. dir .. "/", 1, true) then
-            if vim.fs.root(path, "dbt_project.yml") then
-              return "sql.dbt"
-            end
-            return nil
-          end
-        end
-      end,
-    },
-  },
-})
-
-local augroup = vim.api.nvim_create_augroup("ryanparker_core", { clear = true })
+local augroup = require("ryanparker.util.autocmd").augroup("core")
 
 vim.api.nvim_create_autocmd("TextYankPost", {
   group = augroup,
@@ -54,15 +13,6 @@ vim.api.nvim_create_autocmd("FileType", {
   callback = function()
     vim.opt_local.wrap = true
     vim.opt_local.spell = true
-  end,
-})
-
-vim.api.nvim_create_autocmd("FileType", {
-  group = augroup,
-  pattern = { "java" },
-  callback = function()
-    vim.opt_local.shiftwidth = 4
-    vim.opt_local.tabstop = 4
   end,
 })
 
