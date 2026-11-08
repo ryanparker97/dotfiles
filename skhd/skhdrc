@@ -1,20 +1,21 @@
 # skhd configuration for the Corne 42-key ZMK keyboard.
 #
-# Every window-manager action is bound to a chord + a key on the Corne's WM
-# layer, and nothing else. Focus, zoom and Space keys (TAB H J K L Z F 1-5) use
-# `ctrl + alt`; the rest use `hyper` (cmd + ctrl + alt + shift). Hold the right
-# outer thumb (Enter) for the WM layer; each key sends its chord + <key> at its
-# natural QWERTY position (corne-keyboard/config/corne.keymap, wm_layer):
+# There is no WM layer: type the chords directly on the Corne.
 #
-#   | TAB  .    .    E    R    T    | 1    2    3    4    5    .    |
-#   | .    A    S    D    F    .    | H    J    K    L    .    .    |
-#   | .    Z    X    .    V    B    | .    M    .    .    .    .    |
-#               | .    .    .    | RET  .    WM   |
+# `hyper` (cmd + ctrl + alt + shift) = hold the Tab key (left home-row outer)
+# and press the key. Used for T B R X V A D, Return, and the modes M S E.
 #
-# The keyboard is the source of truth: only bind hyper + keys that exist on
-# that layer, and change the layer there first. Modes work the same way: enter
-# one with WM + M/S/E and keep holding the layer for the next key, so no bare
-# key is needed. (WM + the same key, or Esc, leaves a mode.)
+# `ctrl + alt` = Ctrl (bottom-right on Base) + Option (left outer thumb) + the
+# key. Used for focus H J K L, Tab, zoom F, and Spaces 1-5 (digits need the
+# Nav/Num thumb, where the A-slot Ctrl also works, since H J K L are arrows).
+#
+# skhd matches modifiers exactly, so Hyper + H does not trigger `ctrl + alt - h`.
+#
+# Modes: enter with Hyper + M/S/E, then press Ctrl + Opt + H/J/K/L (or 1-5 in
+# move). Hyper + the same key, or Esc, leaves.
+#
+# The keyboard (corne-keyboard/config/corne.keymap, README.md) is the source of
+# truth.
 #
 # These chords do not collide with macOS defaults (plain ctrl+left/right is
 # Mission Control) or with tmux, which owns plain alt (M-hjkl, M-1..9).
@@ -25,7 +26,7 @@
 :: resize @
 
 # ---------------------------------------------------------------------------
-# WM layer: focus windows (falls through to the neighbouring display at the edge)
+# focus windows (falls through to the neighbouring display at the edge)
 # ---------------------------------------------------------------------------
 
 ctrl + alt - h : yabai -m window --focus west  || yabai -m display --focus west
@@ -37,17 +38,16 @@ ctrl + alt - l : yabai -m window --focus east  || yabai -m display --focus east
 ctrl + alt - tab : yabai -m window --focus recent
 
 # ---------------------------------------------------------------------------
-# WM layer: zoom and float
+# zoom and float
 # ---------------------------------------------------------------------------
 
-ctrl + alt - z : yabai -m window --toggle zoom-parent
 ctrl + alt - f : yabai -m window --toggle zoom-fullscreen
 
 # Toggle floating; a window that becomes floating is centered at 2/3 size.
 hyper - t : yabai -m window --toggle float --grid 6:6:1:1:4:4
 
 # ---------------------------------------------------------------------------
-# WM layer: layout actions
+# layout actions
 # ---------------------------------------------------------------------------
 
 hyper - b : yabai -m space --balance
@@ -58,13 +58,13 @@ hyper - a : yabai -m space --layout stack
 hyper - d : yabai -m space --layout bsp
 
 # ---------------------------------------------------------------------------
-# WM layer: launch
+# launch
 # ---------------------------------------------------------------------------
 
 hyper - return : alacritty msg create-window || open -na Alacritty
 
 # ---------------------------------------------------------------------------
-# WM layer: focus named Spaces (chat/terminal/web/notes/default)
+# focus named Spaces (chat/terminal/web/notes/default)
 # `yabai -m space --focus` needs the scripting addition (SIP off), so these send
 # macOS's own "Switch to Desktop N" shortcut (ctrl + N) instead. Enable them in
 # System Settings > Keyboard > Keyboard Shortcuts > Mission Control. Desktop N
@@ -78,7 +78,7 @@ ctrl + alt - 4 : skhd -k "ctrl - 4"   # notes
 ctrl + alt - 5 : skhd -k "ctrl - 5"   # default
 
 # ---------------------------------------------------------------------------
-# WM layer: enter temporary modes (WM + the same key leaves again)
+# Enter temporary modes (Hyper + the same key leaves again)
 # ---------------------------------------------------------------------------
 
 hyper - m ; move
