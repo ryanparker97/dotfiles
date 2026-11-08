@@ -4,7 +4,7 @@ return {
     enabled = function()
       return vim.fn.executable("dbt") == 1
     end,
-    ft = { "sql", "sql.dbt", "dbt" },
+    ft = require("ryanparker.core.filetypes").family("sql"),
     dependencies = { "nvim-lua/plenary.nvim" },
     opts = {
       path_to_dbt = "dbt",

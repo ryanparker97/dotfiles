@@ -8,17 +8,7 @@ local function is_jdk_home(path)
   return path and path ~= "" and vim.fn.executable(path .. "/bin/java") == 1
 end
 
-local function run(cmd)
-  local ok, res = pcall(vim.system, cmd, { text = true })
-  if not ok then
-    return nil
-  end
-  local out = res:wait()
-  if out.code ~= 0 then
-    return nil
-  end
-  return vim.trim(out.stdout or "")
-end
+local run = require("ryanparker.util.system").run
 
 local function resolve_jdk()
   if jdk_home ~= nil then
@@ -121,11 +111,7 @@ function M.start()
     .. "-"
     .. vim.fn.fnamemodify(root_dir, ":t")
 
-  local capabilities = vim.lsp.protocol.make_client_capabilities()
-  local cok, blink = pcall(require, "blink.cmp")
-  if cok and blink.get_lsp_capabilities then
-    capabilities = blink.get_lsp_capabilities(capabilities)
-  end
+  local capabilities = require("ryanparker.lsp.capabilities").get(vim.lsp.protocol.make_client_capabilities())
 
   if #bundles > 0 then
     require("jdtls.dap").setup_dap({ hotcodereplace = "auto" })

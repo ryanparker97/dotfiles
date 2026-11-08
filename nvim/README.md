@@ -60,15 +60,28 @@ Plugins live in `lua/ryanparker/plugins/*.lua`, one file per topic, imported by 
 | `navigation.lua` | oil, telescope + fzf-native, smart-splits + tmux backend, flash |
 | `editing.lua` | autopairs, surround, plenary |
 | `git.lua` | gitsigns, diffview |
-| `lsp.lua` | mason, mason-lspconfig, mason-tool-installer, lspconfig, nvim-jdtls, schemastore, lazydev |
+| `lsp.lua` | lspconfig, schemastore, lazydev |
+| `mason.lua` | mason, mason-tool-installer (installs what other specs declare) |
+| `plugins/java.lua` | nvim-jdtls, Java debug/test tools |
 | `completion.lua` | blink.cmp, snippets, dadbod source for sql and dbt |
 | `formatting.lua` | conform.nvim |
 | `linting.lua` | nvim-lint |
 | `treesitter.lua` | treesitter parsers |
 | `data.lua` | dbtpal, vim-dadbod, dadbod-ui, markview (markdown rendering) |
 | `dev.lua` | trouble, grug-far, nvim-dap + dap-ui + dap-python, neotest + python/java adapters |
-| `extras.lua` | quicker, treesitter-context, todo-comments, snacks, refactoring, yaml.nvim, overseer |
-| `java.lua` | the jdtls launcher, started from `ftplugin/java.lua` |
+| `extras.lua` | quicker, treesitter-context, todo-comments, snacks, refactoring, yaml.nvim, overseer, markdown-preview |
+| `lua/ryanparker/java.lua` | the jdtls launcher, started from `ftplugin/java.lua` |
+
+## Architecture
+
+- `core/`: options, keymaps, autocmds, diagnostics, and `filetypes.lua` (detection plus the filetype-family registry).
+- `util/`: small helpers (`autocmd`, `keys`, `mason`, `system`); specs depend on these, not on each other's literals.
+- `plugins/`: one lazy spec per topic. `lsp/` holds the shared attach and capabilities code; `after/lsp/<name>.lua` holds per-server settings; `ftplugin/` holds per-filetype setup.
+- SOLID: one job per module; open/closed through `util.mason.ensure` + `opts_extend` and `after/lsp`; dependency inversion through `util/` and the `core/filetypes` registry.
+- Add an LSP server: add its name to the server list in `plugins/lsp.lua`, plus optional `after/lsp/<name>.lua` returning a config table.
+- Add a formatter or linter: add the entry to `formatting.lua` or `linting.lua` and its tool via `require("ryanparker.util.mason").ensure({...})`.
+- Add a filetype family: edit `families` in `core/filetypes.lua`.
+- Smoke test: `nvim --headless -u init.lua -l tests/smoke.lua`.
 
 ## Mason-managed tools
 
@@ -141,6 +154,7 @@ Leader is `<Space>`.
 | `<leader>cd` / `<leader>cl` | line diagnostics / diagnostic loclist |
 | `<leader>cr` | refactoring (0.12.5+) |
 | `<leader>cy` | yank YAML key path (YAML files) |
+| `<leader>mp` | toggle markdown preview in browser, renders mermaid (markdown files) |
 | `]d` / `[d` | next / previous diagnostic (built-in, opens float) |
 | `]t` / `[t` | next / previous todo comment |
 

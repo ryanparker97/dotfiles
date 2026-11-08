@@ -3,26 +3,21 @@ return {
     "mfussenegger/nvim-lint",
     event = { "BufReadPost", "BufNewFile" },
     dependencies = { "mason-org/mason.nvim" },
-    config = function()
-      local lint = require("lint")
-      lint.linters_by_ft = {
+    opts = {
+      linters_by_ft = require("ryanparker.core.filetypes").expand({
         javascript = { "eslint_d" },
-        javascriptreact = { "eslint_d" },
-        typescript = { "eslint_d" },
-        typescriptreact = { "eslint_d" },
         sh = { "shellcheck" },
-        bash = { "shellcheck" },
         dockerfile = { "hadolint" },
         sql = { "sqlfluff" },
-        ["sql.dbt"] = { "sqlfluff" },
-        dbt = { "sqlfluff" },
         terraform = { "tflint" },
-        ["terraform-vars"] = { "tflint" },
-        hcl = { "tflint" },
         markdown = { "markdownlint-cli2" },
         yaml = { "yamllint" },
         ["yaml.cloudformation"] = { "cfn_lint" },
-      }
+      }),
+    },
+    config = function(_, opts)
+      local lint = require("lint")
+      lint.linters_by_ft = opts.linters_by_ft
 
       -- Slow linters: never run while typing (InsertLeave).
       local slow = { sqlfluff = true }
@@ -87,7 +82,7 @@ return {
         lint.try_lint(available)
       end
 
-      local group = vim.api.nvim_create_augroup("nvim_lint", { clear = true })
+      local group = require("ryanparker.util.autocmd").augroup("lint")
       vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost" }, {
         group = group,
         callback = function(args)
@@ -102,4 +97,15 @@ return {
       })
     end,
   },
+  require("ryanparker.util.mason").ensure({
+    "shellcheck",
+    "eslint_d",
+    "hadolint",
+    "tflint",
+    "cfn-lint",
+    "sqlfluff",
+    "markdownlint-cli2",
+    "yamllint",
+    "actionlint",
+  }),
 }

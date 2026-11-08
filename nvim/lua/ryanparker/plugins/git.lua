@@ -5,21 +5,19 @@ return {
     opts = {
       on_attach = function(bufnr)
         local gs = require("gitsigns")
-        local function map(lhs, rhs, desc)
-          vim.keymap.set("n", lhs, rhs, { buffer = bufnr, desc = "Git: " .. desc })
-        end
-        map("]h", function()
+        local map = require("ryanparker.util.keys").buffer_mapper(bufnr, "Git: ")
+        map("n", "]h", function()
           gs.nav_hunk("next")
         end, "Next hunk")
-        map("[h", function()
+        map("n", "[h", function()
           gs.nav_hunk("prev")
         end, "Previous hunk")
-        map("<leader>gs", gs.stage_hunk, "Stage/unstage hunk")
-        map("<leader>gr", gs.reset_hunk, "Reset hunk")
-        map("<leader>gS", gs.stage_buffer, "Stage buffer")
-        map("<leader>gp", gs.preview_hunk, "Preview hunk")
-        map("<leader>gb", gs.blame_line, "Blame line")
-        map("<leader>gB", gs.toggle_current_line_blame, "Toggle line blame")
+        map("n", "<leader>gs", gs.stage_hunk, "Stage/unstage hunk")
+        map("n", "<leader>gr", gs.reset_hunk, "Reset hunk")
+        map("n", "<leader>gS", gs.stage_buffer, "Stage buffer")
+        map("n", "<leader>gp", gs.preview_hunk, "Preview hunk")
+        map("n", "<leader>gb", gs.blame_line, "Blame line")
+        map("n", "<leader>gB", gs.toggle_current_line_blame, "Toggle line blame")
       end,
     },
   },

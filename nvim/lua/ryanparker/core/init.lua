@@ -11,5 +11,7 @@ for _, p in ipairs({ "node", "perl", "python3", "ruby" }) do
 end
 
 require("ryanparker.core.options")
+require("ryanparker.core.filetypes").setup()
+require("ryanparker.core.diagnostics")
 require("ryanparker.core.keymaps")
 require("ryanparker.core.autocmds")
