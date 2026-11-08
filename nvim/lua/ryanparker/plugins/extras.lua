@@ -103,4 +103,15 @@ return {
       { "<leader>ot", "<cmd>OverseerToggle<CR>", desc = "Task list" },
     },
   },
+
+  {
+    -- Live browser preview for markdown; renders ```mermaid blocks (Alacritty can't draw images inline).
+    "iamcco/markdown-preview.nvim",
+    cmd = { "MarkdownPreview", "MarkdownPreviewToggle", "MarkdownPreviewStop" },
+    ft = { "markdown" },
+    build = "cd app && npx --yes yarn install",
+    keys = {
+      { "<leader>mp", "<cmd>MarkdownPreviewToggle<CR>", ft = "markdown", desc = "Markdown preview (browser)" },
+    },
+  },
 }
