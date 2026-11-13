@@ -3,10 +3,43 @@
 # yabai configuration for named macOS Spaces.
 # The first five Spaces are labeled:
 #   1=chat, 2=terminal, 3=web, 4=notes, 5=default
+#
+# Owner prerequisites (not settable from this file):
+#   - Privacy & Security > Accessibility: yabai and skhd enabled.
+#   - Mission Control: "Displays have separate Spaces" on, "Automatically
+#     rearrange Spaces based on most recent use" off.
+#   - Five Desktops created by hand in Mission Control (needs no scripting
+#     addition).
+#   - Keyboard Shortcuts > Mission Control: "Switch to Desktop 1-5" set to
+#     ctrl-1..5.
+#   - No scripting addition or SIP change until upstream supports macOS 27
+#     (asmvik/yabai#2822).
+# Logs: ~/Library/Logs/yabai-config.log (this file and the router) and
+# /tmp/yabai_$USER.err.log (yabai itself).
 
 script_dir="$(CDPATH='' cd "$(dirname "$0")" && pwd -P)" || exit 1
 YABAI_DIR="${YABAI_DIR:-$script_dir}"
 . "$YABAI_DIR/app-categories.sh"
+
+# Failures are logged, never fatal: no `set -e`, so the file always runs to the
+# end. The router logs to the same file with the tag "router:".
+YABAI_LOG="${YABAI_LOG:-${HOME:-/tmp}/Library/Logs/yabai-config.log}"
+log() { printf '%s yabairc: %s\n' "$(date '+%F %T')" "$*" >>"$YABAI_LOG"; }
+
+# One-step rotation: keep the previous log as .1 once it passes 512 KB.
+if [ -f "$YABAI_LOG" ] && [ "$(wc -c <"$YABAI_LOG")" -gt 524288 ]; then
+  mv -f "$YABAI_LOG" "$YABAI_LOG.1"
+fi
+
+# Run a command, log its output and exit code when it fails, return its code.
+try() { _out=$("$@" 2>&1); _rc=$?; [ "$_rc" -eq 0 ] || log "FAILED($_rc): $* :: $_out"; return "$_rc"; }
+
+# "display_changed" when a display signal re-runs this file, otherwise "load".
+reason="${1:-load}"
+
+# Apply rules to already-open windows on a normal load. Set to 0 if windows
+# float or overlap after a restart on macOS 27.
+apply_rules_on_load=1
 
 # Standard macOS application locations. Override for tests or custom installs.
 YABAI_APP_DIRS="${YABAI_APP_DIRS:-/Applications:/System/Applications:/Applications/Utilities:/System/Applications/Utilities}"
@@ -39,7 +72,10 @@ ensure_spaces() {
   case "$count" in ''|*[!0-9]*) count=0 ;; esac
 
   while [ "$count" -lt "$wanted" ]; do
-    yabai -m space --create >/dev/null 2>&1 || break
+    try yabai -m space --create >/dev/null || {
+      log "only $count of $wanted Spaces; space --create needs the scripting addition: create the rest in Mission Control"
+      break
+    }
     sleep 0.2
 
     new_count="$(space_count)"
@@ -57,8 +93,11 @@ label_space() {
   # display_added/display_removed re-run cannot relabel Spaces that were
   # reordered by macOS.
   space_exists "$label" && return 0
-  space_exists "$index" || return 0
-  yabai -m space "$index" --label "$label"
+  space_exists "$index" || {
+    log "no Space $index; label $label not set"
+    return 0
+  }
+  try yabai -m space "$index" --label "$label"
 }
 
 regex_escape() {
@@ -115,20 +154,20 @@ add_rules() {
     # `space --create` needs the scripting addition; without it, Spaces have to
     # be created by hand and this rule is skipped until they exist.
     space_exists "$space" || {
-      echo "yabairc: space '$space' missing, skipping rule for $app" >&2
+      log "space '$space' missing, skipping rule for $app"
       continue
     }
 
     # Some apps (WhatsApp) prefix their name with an invisible character such as
     # U+200E, so tolerate leading non-alphanumeric characters in the match.
     app_regex="^[^[:alnum:]]*$(regex_escape "$app")$"
-    yabai -m rule --add label="$label" app="$app_regex" space="$space"
+    try yabai -m rule --add label="$label" app="$app_regex" space="$space"
   done
 }
 
 # System panels and utilities are never tiled.
 yabai -m rule --remove "no-manage-system" 2>/dev/null || true
-yabai -m rule --add label="no-manage-system" \
+try yabai -m rule --add label="no-manage-system" \
   app="^(System Settings|System Preferences|Calculator|Archive Utility|Finder|1Password)$" \
   manage=off
 
@@ -146,14 +185,17 @@ add_rules notes "$YABAI_NOTES_APPS"
 # a window_created signal after querying the actual window properties.
 ROUTER="$YABAI_DIR/route-default-space.sh"
 yabai -m signal --remove "route-default-space" 2>/dev/null || true
-yabai -m signal --add label="route-default-space" event="window_created" action="/bin/sh \"$ROUTER\" \"\$YABAI_WINDOW_ID\""
+try yabai -m signal --add label="route-default-space" event="window_created" action="/bin/sh \"$ROUTER\" \"\$YABAI_WINDOW_ID\""
 
 # Rules above are stored with numeric Space indexes, which shift when displays
 # come and go. Re-run this file so they are rebuilt against the current layout.
 for event in display_added display_removed; do
   yabai -m signal --remove "reload-rules-$event" 2>/dev/null || true
-  yabai -m signal --add label="reload-rules-$event" event="$event" action="/bin/sh \"$YABAI_DIR/yabairc\""
+  try yabai -m signal --add label="reload-rules-$event" event="$event" action="/bin/sh \"$YABAI_DIR/yabairc\" display_changed"
 done
 
-# Apply rules to already-open windows on reload where yabai supports it.
-yabai -m rule --apply 2>/dev/null || true
+# Apply rules to already-open windows on startup or a manual reload. Display
+# re-runs only rebuild the indexes above; they do not move open windows.
+if [ "$reason" != display_changed ] && [ "$apply_rules_on_load" = 1 ]; then
+  try yabai -m rule --apply
+fi
