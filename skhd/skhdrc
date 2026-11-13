@@ -2,23 +2,19 @@
 #
 # There is no WM layer: type the chords directly on the Corne.
 #
-# `hyper` (cmd + ctrl + alt + shift) = hold the Tab key (left home-row outer)
-# and press the key. Used for T B R X V A D, Return, and the modes M S E.
+# Every chord is `hyper` (cmd + ctrl + alt + shift) = hold the Tab key (left
+# home-row outer) and press the key. Used for focus H J K L, Tab, zoom F, float
+# T, layout B R X V A D, Return, Spaces 1-5 (digits need the Nav/Num thumb), and
+# the modes M S E.
 #
-# `ctrl + alt` = Ctrl (bottom-right on Base) + Option (left outer thumb) + the
-# key. Used for focus H J K L, Tab, zoom F, and Spaces 1-5 (digits need the
-# Nav/Num thumb, where the A-slot Ctrl also works, since H J K L are arrows).
-#
-# skhd matches modifiers exactly, so Hyper + H does not trigger `ctrl + alt - h`.
-#
-# Modes: enter with Hyper + M/S/E, then press Ctrl + Opt + H/J/K/L (or 1-5 in
-# move). Hyper + the same key, or Esc, leaves.
+# Modes: enter with Hyper + M/S/E, then press Hyper + H/J/K/L (or 1-5 in move).
+# Hyper + the same key, or Esc, leaves.
 #
 # The keyboard (corne-keyboard/config/corne.keymap, README.md) is the source of
 # truth.
 #
-# These chords do not collide with macOS defaults (plain ctrl+left/right is
-# Mission Control) or with tmux, which owns plain alt (M-hjkl, M-1..9).
+# These chords do not collide with macOS defaults or with tmux, which owns plain
+# alt (M-hjkl, M-1..9).
 
 # Mode declarations must precede the bindings that enter them.
 :: move @
@@ -29,19 +25,19 @@
 # focus windows (falls through to the neighbouring display at the edge)
 # ---------------------------------------------------------------------------
 
-ctrl + alt - h : yabai -m window --focus west  || yabai -m display --focus west
-ctrl + alt - j : yabai -m window --focus south || yabai -m display --focus south
-ctrl + alt - k : yabai -m window --focus north || yabai -m display --focus north
-ctrl + alt - l : yabai -m window --focus east  || yabai -m display --focus east
+hyper - h : yabai -m window --focus west  || yabai -m display --focus west
+hyper - j : yabai -m window --focus south || yabai -m display --focus south
+hyper - k : yabai -m window --focus north || yabai -m display --focus north
+hyper - l : yabai -m window --focus east  || yabai -m display --focus east
 
 # Jump back to the previously focused window.
-ctrl + alt - tab : yabai -m window --focus recent
+hyper - tab : yabai -m window --focus recent
 
 # ---------------------------------------------------------------------------
 # zoom and float
 # ---------------------------------------------------------------------------
 
-ctrl + alt - f : yabai -m window --toggle zoom-fullscreen
+hyper - f : yabai -m window --toggle zoom-fullscreen
 
 # Toggle floating; a window that becomes floating is centered at 2/3 size.
 hyper - t : yabai -m window --toggle float --grid 6:6:1:1:4:4
@@ -65,17 +61,18 @@ hyper - return : alacritty msg create-window || open -na Alacritty
 
 # ---------------------------------------------------------------------------
 # focus named Spaces (chat/terminal/web/notes/default)
-# `yabai -m space --focus` needs the scripting addition (SIP off), so these send
-# macOS's own "Switch to Desktop N" shortcut (ctrl + N) instead. Enable them in
+# yabai's SIP-on `space --focus` (7.1.19+) is broken on macOS 27 (asmvik/yabai
+# #2822, #2842), so these send macOS's own "Switch to Desktop N" shortcut
+# (ctrl + N) instead. Enable them in
 # System Settings > Keyboard > Keyboard Shortcuts > Mission Control. Desktop N
 # is Space index N, which matches the labels in yabairc.
 # ---------------------------------------------------------------------------
 
-ctrl + alt - 1 : skhd -k "ctrl - 1"   # chat
-ctrl + alt - 2 : skhd -k "ctrl - 2"   # terminal
-ctrl + alt - 3 : skhd -k "ctrl - 3"   # web
-ctrl + alt - 4 : skhd -k "ctrl - 4"   # notes
-ctrl + alt - 5 : skhd -k "ctrl - 5"   # default
+hyper - 1 : skhd -k "ctrl - 1"   # chat
+hyper - 2 : skhd -k "ctrl - 2"   # terminal
+hyper - 3 : skhd -k "ctrl - 3"   # web
+hyper - 4 : skhd -k "ctrl - 4"   # notes
+hyper - 5 : skhd -k "ctrl - 5"   # default
 
 # ---------------------------------------------------------------------------
 # Enter temporary modes (Hyper + the same key leaves again)
@@ -86,35 +83,37 @@ hyper - s ; swap
 hyper - e ; resize
 
 # Warp/move focused window within the current Space, then return to default mode.
-move < ctrl + alt - h : yabai -m window --warp west  ; skhd -k 'escape'
-move < ctrl + alt - j : yabai -m window --warp south ; skhd -k 'escape'
-move < ctrl + alt - k : yabai -m window --warp north ; skhd -k 'escape'
-move < ctrl + alt - l : yabai -m window --warp east  ; skhd -k 'escape'
+move < hyper - h : yabai -m window --warp west  ; skhd -k 'escape'
+move < hyper - j : yabai -m window --warp south ; skhd -k 'escape'
+move < hyper - k : yabai -m window --warp north ; skhd -k 'escape'
+move < hyper - l : yabai -m window --warp east  ; skhd -k 'escape'
 
 # Send the focused window to a named Space without following it. Moving a window
-# to another Space may require the yabai scripting addition on current macOS.
-move < ctrl + alt - 1 : yabai -m window --space chat     ; skhd -k 'escape'
-move < ctrl + alt - 2 : yabai -m window --space terminal ; skhd -k 'escape'
-move < ctrl + alt - 3 : yabai -m window --space web      ; skhd -k 'escape'
-move < ctrl + alt - 4 : yabai -m window --space notes    ; skhd -k 'escape'
-move < ctrl + alt - 5 : yabai -m window --space default  ; skhd -k 'escape'
+# to another Space uses yabai's SIP-on window-move path, which is unverified on
+# macOS 27. If it fails, the window stays put, the error goes to
+# /tmp/skhd_$USER.err.log, and the mode still exits.
+move < hyper - 1 : yabai -m window --space chat     ; skhd -k 'escape'
+move < hyper - 2 : yabai -m window --space terminal ; skhd -k 'escape'
+move < hyper - 3 : yabai -m window --space web      ; skhd -k 'escape'
+move < hyper - 4 : yabai -m window --space notes    ; skhd -k 'escape'
+move < hyper - 5 : yabai -m window --space default  ; skhd -k 'escape'
 move < hyper - m ; default
 move < escape ; default
 
 # Swap focused window, then return to default mode.
-swap < ctrl + alt - h : yabai -m window --swap west  ; skhd -k 'escape'
-swap < ctrl + alt - j : yabai -m window --swap south ; skhd -k 'escape'
-swap < ctrl + alt - k : yabai -m window --swap north ; skhd -k 'escape'
-swap < ctrl + alt - l : yabai -m window --swap east  ; skhd -k 'escape'
+swap < hyper - h : yabai -m window --swap west  ; skhd -k 'escape'
+swap < hyper - j : yabai -m window --swap south ; skhd -k 'escape'
+swap < hyper - k : yabai -m window --swap north ; skhd -k 'escape'
+swap < hyper - l : yabai -m window --swap east  ; skhd -k 'escape'
 swap < hyper - s ; default
 swap < escape ; default
 
 # Resize stays active until you leave it, so you can tap H/J/K/L repeatedly.
 # Each key grows toward its direction, or shrinks the opposite edge when already
 # at the screen boundary.
-resize < ctrl + alt - h : yabai -m window --resize left:-60:0  || yabai -m window --resize right:-60:0
-resize < ctrl + alt - j : yabai -m window --resize bottom:0:60 || yabai -m window --resize top:0:60
-resize < ctrl + alt - k : yabai -m window --resize top:0:-60   || yabai -m window --resize bottom:0:-60
-resize < ctrl + alt - l : yabai -m window --resize right:60:0  || yabai -m window --resize left:60:0
+resize < hyper - h : yabai -m window --resize left:-60:0  || yabai -m window --resize right:-60:0
+resize < hyper - j : yabai -m window --resize bottom:0:60 || yabai -m window --resize top:0:60
+resize < hyper - k : yabai -m window --resize top:0:-60   || yabai -m window --resize bottom:0:-60
+resize < hyper - l : yabai -m window --resize right:60:0  || yabai -m window --resize left:60:0
 resize < hyper - e ; default
 resize < escape ; default
