@@ -24,19 +24,19 @@
 # focus windows (falls through to the neighbouring display at the edge)
 # ---------------------------------------------------------------------------
 
-ctrl + alt - h : yabai -m window --focus west  || yabai -m display --focus west
-ctrl + alt - j : yabai -m window --focus south || yabai -m display --focus south
-ctrl + alt - k : yabai -m window --focus north || yabai -m display --focus north
-ctrl + alt - l : yabai -m window --focus east  || yabai -m display --focus east
+hyper - h : yabai -m window --focus west  || yabai -m display --focus west
+hyper - j : yabai -m window --focus south || yabai -m display --focus south
+hyper - k : yabai -m window --focus north || yabai -m display --focus north
+hyper - l : yabai -m window --focus east  || yabai -m display --focus east
 
 # Jump back to the previously focused window.
-ctrl + alt - tab : yabai -m window --focus recent
+hyper - tab : yabai -m window --focus recent
 
 # ---------------------------------------------------------------------------
 # zoom and float
 # ---------------------------------------------------------------------------
 
-ctrl + alt - f : yabai -m window --toggle zoom-fullscreen
+hyper - f : yabai -m window --toggle zoom-fullscreen
 
 # Toggle floating; a window that becomes floating is centered at 2/3 size.
 ctrl + alt - t : yabai -m window --toggle float --grid 6:6:1:1:4:4
@@ -67,11 +67,11 @@ ctrl + alt - return : alacritty msg create-window || open -na Alacritty
 # is Space index N, which matches the labels in yabairc.
 # ---------------------------------------------------------------------------
 
-ctrl + alt - 1 : skhd -k "ctrl - 1"   # chat
-ctrl + alt - 2 : skhd -k "ctrl - 2"   # terminal
-ctrl + alt - 3 : skhd -k "ctrl - 3"   # web
-ctrl + alt - 4 : skhd -k "ctrl - 4"   # notes
-ctrl + alt - 5 : skhd -k "ctrl - 5"   # default
+hyper - 1 : skhd -k "ctrl - 1"   # chat
+hyper - 2 : skhd -k "ctrl - 2"   # terminal
+hyper - 3 : skhd -k "ctrl - 3"   # web
+hyper - 4 : skhd -k "ctrl - 4"   # notes
+hyper - 5 : skhd -k "ctrl - 5"   # default
 
 # ---------------------------------------------------------------------------
 # Enter temporary modes (the plain mode key or Esc leaves again)
