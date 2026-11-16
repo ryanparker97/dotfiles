@@ -1,5 +1,12 @@
-alias ll='ls -lh'
-alias la='ls -lah'
+# Aliases, loaded after Oh My Zsh so they replace its defaults.
+# ll and la use eza when installed (long table, human sizes by default; la adds hidden files).
+if (( ${+commands[eza]} )); then
+  alias ll='eza -l'
+  alias la='eza -la'
+else
+  alias ll='ls -lh'
+  alias la='ls -lah'
+fi
 
 if (( ${+commands[bat]} )); then
   alias cat='bat --paging=never'
@@ -18,7 +25,6 @@ if (( ${+commands[nvim]} )); then
   alias vim='nvim'
 fi
 
-if (( ${+commands[git]} )); then
-  alias glog='PAGER="less -F -X" git log'
-  alias gadog='PAGER="less -F -X" git log --all --decorate --oneline --graph'
+if (( ${+commands[lazygit]} )); then
+  alias lg='lazygit'
 fi

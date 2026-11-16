@@ -1,0 +1,93 @@
+# What the refactored config must still provide (acceptance row A3), from the
+# zsh-refactor scout notes' inventory, checked against the U1 baseline
+# snapshot. Checked by: zsh tests/snapshot.zsh --inventory <snap>
+#
+# One key per line; a line starting with '#' is a comment.
+#   alias|NAME, function|NAME, export|NAME   NAME must exist, any value
+#   any other kind                           the whole snapshot line must exist
+# $HOME stands for the home directory, as it does in snapshots.
+
+# Aliases (custom/aliases.zsh, as the owner edited it before U1: glog and
+# gadog removed, lg added). diff is kept: the baseline has it (the --color
+# probe in aliases.zsh passes on this machine). lg sits under a lazygit guard;
+# lazygit is installed, so the baseline has it.
+alias|ll
+alias|la
+alias|cat
+alias|df
+alias|diff
+alias|vim
+alias|lg
+alias|fk
+alias|fuck
+
+# Functions: the config's own, then one per plugin that proves it loaded
+# (dotenv, zsh-autosuggestions, zsh-syntax-highlighting).
+function|_zsh_cached_init
+function|_fzf_files_no_hidden
+function|_fzf_file_no_hidden
+function|source_env
+function|_zsh_autosuggest_start
+function|_zsh_highlight
+
+# The 15 exported variables core/zshenv and custom/fzf.zsh set (not a key: the
+# _PR_AI_DISABLE flag custom/pay-respects.zsh exports).
+export|XDG_CONFIG_HOME
+export|XDG_CACHE_HOME
+export|XDG_DATA_HOME
+export|XDG_STATE_HOME
+export|ZSH_CONFIG_ROOT
+export|ZSH
+export|STARSHIP_CONFIG
+export|EDITOR
+export|VISUAL
+export|COLORTERM
+export|JAVA_HOME
+export|FZF_DEFAULT_COMMAND
+export|FZF_CTRL_T_COMMAND
+export|FZF_DEFAULT_OPTS
+export|FZF_CTRL_T_OPTS
+
+# History.
+var|HISTFILE=$HOME/.local/state/zsh/history
+var|HISTSIZE=100000
+var|SAVEHIST=100000
+
+# PATH entries the repo adds: interactive login shell (core/zshenv and
+# core/zprofile), and core/zshenv's own for non-login `zsh -c` children.
+path|/opt/homebrew/bin
+path|/opt/homebrew/sbin
+path|/opt/homebrew/opt/openjdk/bin
+path|$HOME/.local/bin
+nonint-path|/opt/homebrew/bin
+nonint-path|/opt/homebrew/sbin
+nonint-path|/opt/homebrew/opt/openjdk/bin
+
+# Key bindings (emacs keymap, custom/keys.zsh) and the main keymap.
+bind-emacs|"^F" _fzf_file_no_hidden
+bind-emacs|"^G" fzf-cd-widget
+bind-emacs|"^[," insert-last-word
+bind-emacs|"^[[H" beginning-of-line
+bind-emacs|"^[OH" beginning-of-line
+bind-emacs|"^[[F" end-of-line
+bind-emacs|"^[OF" end-of-line
+keymap|bindkey -A emacs main
+
+# Options (custom/history.zsh and custom/options.zsh).
+option|sharehistory=on
+option|histignorealldups=on
+option|histignorespace=on
+option|autocd=on
+option|beep=off
+option|numericglobsort=on
+
+# The three zstyles the repo sets. matcher-list is the live value: Oh My Zsh's
+# lib/completion.zsh replaces the repo's 'm:{a-z}={A-Za-z}'.
+zstyle|zstyle ':completion:*' menu select
+zstyle|zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' 'r:|=*' 'l:|=* r:|=*'
+zstyle|zstyle :omz:update mode disabled
+
+# Oh My Zsh plugins, in load order.
+plugin|dotenv
+plugin|zsh-autosuggestions
+plugin|zsh-syntax-highlighting

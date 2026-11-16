@@ -1,3 +1,4 @@
+# fzf: commands and options for its widgets, the no-hidden-files Ctrl-F widget, and fzf's own init.
 # Commands consumed by fzf's standard Ctrl-T integration.
 if (( ${+commands[fd]} )); then
   export FZF_DEFAULT_COMMAND='fd --type f --hidden --strip-cwd-prefix --exclude .git'
@@ -42,5 +43,8 @@ _fzf_file_no_hidden() {
 # ZLE is unavailable when this module is sourced by syntax/noninteractive tests.
 if [[ -o interactive ]]; then
   zle -N _fzf_file_no_hidden
-  bindkey '^F' _fzf_file_no_hidden
+  bindkey -M viins '^F' _fzf_file_no_hidden
 fi
+
+# fzf's own key bindings and completion, from the cached `fzf --zsh` output.
+[[ -o interactive ]] && _zsh_cached_init fzf --zsh
