@@ -14,16 +14,9 @@ $git_state\
 $git_status\
 $package\
 $nodejs\
-$bun\
-$deno\
 $python\
-$rust\
-$golang\
-$php\
-$terraform\
 $docker_context\
 $kubernetes\
-$direnv\
 $jobs\
 $status\
 $cmd_duration\
@@ -95,34 +88,9 @@ display_private = false
 symbol = "node "
 format = "[$symbol$version](green) "
 
-[bun]
-symbol = "bun "
-format = "[$symbol$version](yellow) "
-
-[deno]
-symbol = "deno "
-format = "[$symbol$version](green) "
-
 [python]
 symbol = "py "
 format = "[$symbol$version( (\\($virtualenv\\)))](yellow) "
-
-[rust]
-symbol = "rs "
-format = "[$symbol$version](red) "
-
-[golang]
-symbol = "go "
-format = "[$symbol$version](cyan) "
-
-[php]
-symbol = "php "
-format = "[$symbol$version](purple) "
-
-[terraform]
-symbol = "tf "
-format = "[$symbol$workspace]($style) "
-style = "purple"
 
 [docker_context]
 symbol = "docker "
@@ -163,12 +131,6 @@ style = "yellow"
 [[kubernetes.contexts]]
 context_pattern = ".*(dev|local|minikube|kind).*"
 style = "green"
-
-[direnv]
-disabled = false
-symbol = "env "
-format = "[$symbol$loaded/$allowed]($style) "
-style = "yellow"
 
 [jobs]
 symbol = "✦"

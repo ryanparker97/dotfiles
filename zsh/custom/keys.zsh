@@ -1,3 +1,4 @@
+# Key bindings: emacs keymap, Home/End, the fzf keys, last word and edit-command-line.
 # Compatibility with Alacritty, tmux and fzf. Sourced after OMZ.
 
 # Alacritty sends ^A/^E/^U/^L and ESC b/f for Cmd/Alt shortcuts: stay on emacs keys.
@@ -13,7 +14,12 @@ if (( ${+widgets[fzf-cd-widget]} )); then
 fi
 bindkey '^[,' insert-last-word
 
-# Fall back to a plain compinit when OMZ is absent so completion still works.
-if (( ! ${+functions[compdef]} )); then
-  autoload -Uz compinit && compinit -i -d "${ZSH_COMPDUMP:-${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompdump}"
+# Ctrl-X Ctrl-E edits the command line in $EDITOR (already bound via Oh My Zsh).
+autoload -Uz edit-command-line
+zle -N edit-command-line
+bindkey -M emacs '^X^E' edit-command-line
+
+# OMZ and fzf may install bindings after the custom widget is registered.
+if [[ -o interactive ]]; then
+  bindkey '^F' _fzf_file_no_hidden
 fi
